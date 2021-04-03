@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Croher.Build": {
+      "commandName": "Project",
+      "commandLineArgs": "build -in TestCodes.croh -out output.txt"
+    },
+    "Croher.Help": {
+      "commandName": "Project"
+    }
+  }
+}
