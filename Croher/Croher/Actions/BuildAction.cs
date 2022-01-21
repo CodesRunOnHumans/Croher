@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Croher.Actions
 {
-    class BuildAction : IAction
+    internal class BuildAction : IAction
     {
         public ActionHelpMessages HelpMessages => new ActionHelpMessages(
             "To compile the codes.",
@@ -28,12 +24,14 @@ namespace Croher.Actions
             using var inputFile = new FileInfo(input).OpenRead();
 
             Console.WriteLine("Creating output file...");
-            using var outputFile = new FileInfo(output).OpenWrite();
+            var outputFileInfo = new FileInfo(output);
+            using var outputFile = outputFileInfo.OpenWrite();
 
             Console.WriteLine("Compiling...");
             inputFile.CopyTo(outputFile);
             outputFile.Flush();
 
+            Console.WriteLine($"Succeeded: {outputFileInfo.FullName}");
             return true;
         }
     }

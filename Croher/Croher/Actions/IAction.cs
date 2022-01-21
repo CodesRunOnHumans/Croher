@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Croher.Actions
 {
-    interface IAction
+    internal interface IAction
     {
         bool Execute(IDictionary<string, string> parameters);
         ActionHelpMessages HelpMessages { get; }

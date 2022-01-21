@@ -5,37 +5,46 @@ using System.Reflection;
 
 namespace Croher
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            PrintStartMessages();
+            PrintStartingMessages();
             PrintSplitLine();
-            var (actionName, parameters) = ParseArguments(args);
-            var actionType = Assembly.GetExecutingAssembly().GetType(
-                $"Croher.Actions.{actionName}Action", false, true) ?? typeof(HelpAction);
 
-            var constructor = actionType.GetConstructor(Array.Empty<Type>());
-            var action = constructor?.Invoke(null) ?? new HelpAction();
-            if(!((IAction)action).Execute(parameters))
+            var (actionName, parameters) = ParseArguments(args);
+            var fullName = $"{HelpAction.ActionClassNamespace}." +
+                $"{actionName}{HelpAction.ActionClassExtensionName}";
+
+            var actionClass = Assembly.GetExecutingAssembly().GetType(
+                fullName, false, ignoreCase: true) ?? typeof(HelpAction);
+
+            var constructor = actionClass.GetConstructor(Array.Empty<Type>());
+            var action = (IAction)(constructor?.Invoke(null) ?? new HelpAction());
+            if (!action.Execute(parameters))
                 _ = new HelpAction().Execute();
 
             PrintSplitLine();
-            Console.WriteLine("Work Finished.");
+            PrintEndingMessages();
         }
 
-        static void PrintSplitLine(int count = 10, char character = '=')
+        private static void PrintSplitLine(int count = 10, char character = '=')
         {
-            for (int i = 0; i < count; i++)
-                Console.Write(character);
-            Console.WriteLine();
+            Console.WriteLine(string.Empty.PadLeft(count, character));
         }
-        static void PrintStartMessages()
+
+        private static void PrintEndingMessages()
+        {
+            Console.WriteLine("Done.");
+        }
+
+        private static void PrintStartingMessages()
         {
             var name = Assembly.GetExecutingAssembly().GetName();
-            Console.WriteLine($"{name.Name} v{name.Version?.ToString(3) ?? "unknown"}");
+            Console.WriteLine($"{name.Name} v{name.Version?.ToString(3) ?? "ersion: unknown"}");
         }
-        static (string actionName, IDictionary<string, string> parameters) ParseArguments(string[] args)
+
+        private static (string actionName, IDictionary<string, string> parameters) ParseArguments(string[] args)
         {
             Dictionary<string, string> result = new();
 
@@ -43,9 +52,8 @@ namespace Croher
                 return ("help", result);
 
             for (int i = 1; i < args.Length; i++)
-            {
                 result.Add(args[i], args[++i]);
-            }
+
             return (args[0], result);
         }
     }
